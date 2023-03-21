@@ -138,7 +138,17 @@ object WebCrawler extends App {
         // In the latter, use the method createURL(Option[URL], String) to get the appropriate URL for a relative link.
         // Don't forget to run it through validateURL.
         // 16 points.
-        def getURLs(ns: Node): Seq[Try[URL]] = ??? // TO BE IMPLEMENTED
+        def getURLs(ns: Node): Seq[Try[URL]] = {
+            val a = for {
+                n <- ns \\ "a"
+                hr <- n \ "@href"
+            } yield createURL(Option(url), hr.toString())
+            val b: Seq[URL] = a.flatMap(_.toOption)
+            for{
+                x<-b
+            }yield validateURL(x)
+        }
+        // TO BE IMPLEMENTED
 
         def getLinks(g: String): Try[Seq[URL]] = {
             val ny: Try[Node] = HTMLParser.parse(g) recoverWith { case f => Failure(new RuntimeException(s"parse problem with URL $url: $f")) }
@@ -146,8 +156,12 @@ object WebCrawler extends App {
         }
         // Hint: write as a for-comprehension, using getURLContent (above) and getLinks above. You will also need MonadOps.asFuture
         // 9 points.
-        ??? // TO BE IMPLEMENTED
+        for {
+            a <- getURLContent(url)
+            b <- MonadOps.asFuture(getLinks(a))
+        } yield b // TO BE IMPLEMENTED
     }
+
 
     /**
      * For a given list of URLs, get a (flattened) sequence of URLs by invoking wget(URL).

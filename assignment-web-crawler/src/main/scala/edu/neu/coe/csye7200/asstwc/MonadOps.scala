@@ -247,7 +247,7 @@ object MonadOps {
    * @tparam X the underlying type.
    * @return if xe is a Right(x) then Some(x) else None.
    */
-  def asOption[X](xe: Either[Throwable, X]): Option[X] = ??? // TO BE IMPLEMENTED
+  def asOption[X](xe: Either[Throwable, X]): Option[X] =xe.toOption // TO BE IMPLEMENTED
 
   /**
    * Method to zip two Optional objects together.
@@ -374,8 +374,10 @@ object MonadOps {
     case Failure(e) =>
       // TODO Merge with identical code below
       xy match {
-        case Success(_) =>
-        case Failure(z) => onFailure(z)
+        case Success(_) => xsy
+        case Failure(z) =>
+          onFailure(z)
+          Failure(e)
       }
       Failure(e)
   }
